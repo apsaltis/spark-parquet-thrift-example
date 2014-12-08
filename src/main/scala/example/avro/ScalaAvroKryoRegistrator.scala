@@ -26,6 +26,12 @@ import org.apache.avro.specific.{SpecificDatumReader, SpecificDatumWriter, Speci
 import org.apache.spark.serializer.KryoRegistrator
 
 import scala.reflect.ClassTag
+import com.esotericsoftware.kryo.Kryo
+import com.twitter.chill.avro.AvroSerializer
+import org.apache.avro.generic.GenericRecord
+import org.apache.spark.serializer.KryoRegistrator
+
+
 
 // This file is based (and mostly copied from):
 // https://github.com/bigdatagenomics/adam/blob/master/adam-core/src/main/scala/org/bdgenomics/adam/serialization/ADAMKryoRegistrator.scala
@@ -70,7 +76,11 @@ class AvroSerializer[T <: SpecificRecord](implicit tag: ClassTag[T]) extends Ser
 
 class SparkAvroKryoRegistrator extends KryoRegistrator {
   override def registerClasses(kryo: Kryo) {
-    kryo.register(classOf[User], new AvroSerializer[User]())
-    kryo.register(classOf[Message], new AvroSerializer[Message]())
+    //kryo.register(classOf[User], new AvroSerializer[User]())
+    //kryo.register(classOf[Message], new AvroSerializer[Message]())
+    kryo.register(classOf[GenericRecord], AvroSerializer.GenericRecordSerializer[GenericRecord]())
+    kryo.register(classOf[User], AvroSerializer.SpecificRecordSerializer[User])
+    kryo.register(classOf[Message], AvroSerializer.SpecificRecordSerializer[Message])
+
   }
 }
