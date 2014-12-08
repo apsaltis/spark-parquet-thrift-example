@@ -38,9 +38,16 @@ import parquet.hadoop.{ParquetInputFormat, ParquetOutputFormat}
 
 import example.thrift.spark_parquet_thrift.SampleThriftObject
 
+/*
+sbt assembly && ~SPARK_HOME/bin/spark-submit \
+  --class "example.thrift.SparkParquetThriftApp" \
+  --master "local[*]" \
+  target/scala-2.10/SparkParquetThrift.jar
+ */
+
 object SparkParquetThriftApp {
   def main(args: Array[String]) {
-    val mem = "30g"
+    val mem = "3g"
     println("Initializing Spark context.")
     println("  Memory: " + mem)
     val sparkConf = new SparkConf()
@@ -58,7 +65,7 @@ object SparkParquetThriftApp {
     println(sampleData.map("  - " + _).mkString("\n"))
 
     val job = new Job()
-    val parquetStore = "hdfs://server_address.com:8020/sample_store"
+    val parquetStore = "file:///tmp/sample_store"
     println("Writing sample data to Parquet.")
     println("  - ParquetStore: " + parquetStore)
     ParquetThriftOutputFormat.setThriftClass(job, classOf[SampleThriftObject])
