@@ -15,7 +15,7 @@ import example.avro.UserOperations._
 sbt assembly && ~SPARK_HOME/bin/spark-submit \
   --class "example.avro.ParquetAvroSparkExample" \
   --master "local[*]" \
-  target/scala-2.10/SparkParquetThrift.jar
+  target/scala-2.10/SparkParquetAvroThrift.jar
  */
 
 object ParquetAvroSparkExample {
