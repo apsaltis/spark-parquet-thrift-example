@@ -21,13 +21,35 @@ import com.github.bigtoast.sbtthrift.ThriftPlugin
 
 assemblySettings
 
-jarName in assembly := "SparkParquetThrift.jar"
+jarName in assembly := "SparkParquetAvroThrift.jar"
 
-name := "SparkParquetThrift"
+name := "SparkParquetAvroThrift"
 
 version := "1.0"
 
+fork := true
+
 scalaVersion := "2.10.4"
+
+seq(ThriftPlugin.thriftSettings: _*)
+
+seq(sbtavro.SbtAvro.avroSettings : _*)
+
+// Configure the desired Avro version.  sbt-avro automatically injects a libraryDependency.
+(version in avroConfig) := "1.7.6"
+
+// Look for *.avsc etc. files in src/test/avro
+(sourceDirectory in avroConfig) <<= (sourceDirectory in Compile)(_ / "avro")
+
+(stringType in avroConfig) := "String"
+
+// https://github.com/jrudolph/sbt-dependency-graph
+net.virtualvoid.sbt.graph.Plugin.graphSettings
+
+val bijectionVersion = "0.7.0"
+val chillVersion = "0.5.1"
+val sparkVersion = "1.1.1"
+val stormVersion = "0.9.3"
 
 libraryDependencies ++= Seq(
   // Spark dependencies.
@@ -47,10 +69,17 @@ libraryDependencies ++= Seq(
   "org.apache.thrift" % "libthrift" % "0.9.1",
   "com.twitter" % "parquet-thrift" % "1.5.0",
   "com.twitter" % "parquet-avro" % "1.5.0",
-  "org.apache.avro" % "avro" % "1.6.3",
-  "org.apache.avro" % "avro-mapred" % "1.6.3",
-  "it.unimi.dsi" % "fastutil" % "6.1.0"
+  //"org.apache.avro" % "avro" % "1.7.6",
+  "org.apache.avro" % "avro-mapred" % "1.7.6",
+  "it.unimi.dsi" % "fastutil" % "6.1.0",
+  "com.twitter" %% "bijection-core" % bijectionVersion,
+  "com.twitter" %% "bijection-avro" % bijectionVersion,
+  "com.twitter" %% "chill" % chillVersion,
+  "com.twitter" %% "chill-avro" % chillVersion,
+  "com.twitter" %% "chill-bijection" % chillVersion
 )
+
+libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-reflect" % _)
 
 resolvers ++= Seq(
   "Akka Repository" at "http://repo.akka.io/releases/",
@@ -59,6 +88,93 @@ resolvers ++= Seq(
   "sbt-plugin-releases" at "http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases"
 )
 
-seq(ThriftPlugin.thriftSettings: _*)
 
-seq(sbtavro.SbtAvro.avroSettings : _*)
+
+javaOptions ++= Seq(
+  "-Xms256m",
+  "-Xmx512m",
+  "-XX:+UseG1GC",
+  "-XX:MaxGCPauseMillis=20",
+  "-XX:InitiatingHeapOccupancyPercent=35",
+  "-Djava.awt.headless=true",
+  "-Djava.net.preferIPv4Stack=true")
+
+javacOptions in Compile ++= Seq(
+  "-source", "1.7",
+  "-target", "1.7",
+  "-Xlint:unchecked",
+  "-Xlint:deprecation")
+
+scalacOptions ++= Seq(
+  "-target:jvm-1.7",
+  "-encoding", "UTF-8"
+)
+
+scalacOptions in Compile ++= Seq(
+  "-deprecation", // Emit warning and location for usages of deprecated APIs.
+  "-feature",  // Emit warning and location for usages of features that should be imported explicitly.
+  "-unchecked", // Enable additional warnings where generated code depends on assumptions.
+  "-Xlint", // Enable recommended additional warnings.
+  "-Ywarn-adapted-args", // Warn if an argument list is modified to match the receiver.
+  "-Ywarn-dead-code",
+  "-Ywarn-value-discard" // Warn when non-Unit expression results are unused.
+)
+
+scalacOptions in Test ~= { (options: Seq[String]) =>
+  options.filterNot(_ == "-Ywarn-value-discard").filterNot(_ == "-Ywarn-dead-code" /* to fix warnings due to Mockito */)
+}
+
+scalacOptions in ScoverageTest ~= { (options: Seq[String]) =>
+  options.filterNot(_ == "-Ywarn-value-discard").filterNot(_ == "-Ywarn-dead-code" /* to fix warnings due to Mockito */)
+}
+
+publishArtifact in Test := false
+
+parallelExecution in ThisBuild := false
+
+// Write test results to file in JUnit XML format
+testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports/junitxml")
+
+// Write test results to console.
+//
+// Tip: If you need to troubleshoot test runs, it helps to use the following reporting setup for ScalaTest.
+//      Notably these suggested settings will ensure that all test output is written sequentially so that it is easier
+//      to understand sequences of events, particularly cause and effect.
+//      (cf. http://www.scalatest.org/user_guide/using_the_runner, section "Configuring reporters")
+//
+//        testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oUDT", "-eUDT")
+//
+//        // This variant also disables ANSI color output in the terminal, which is helpful if you want to capture the
+//        // test output to file and then run grep/awk/sed/etc. on it.
+//        testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oWUDT", "-eWUDT")
+//
+testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-o")
+
+// See https://github.com/scoverage/scalac-scoverage-plugin
+instrumentSettings
+
+run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run))
+
+mergeStrategy in assembly <<= (mergeStrategy in assembly) {
+  (old) => {
+    case s if s.endsWith(".class") => MergeStrategy.last
+    case s if s.endsWith(".default") => MergeStrategy.last
+    case s if s.endsWith(".map") => MergeStrategy.last
+    case s if s.endsWith(".providers") => MergeStrategy.last
+    case s if s.endsWith(".properties") => MergeStrategy.last
+    case s if s.endsWith(".RSA") => MergeStrategy.last
+    case s if s.endsWith("mailcap") => MergeStrategy.last
+    case PathList("org", "apache", xs @ _*) => MergeStrategy.last
+    case PathList("maven", xs @ _*) => MergeStrategy.last
+    case x => old(x)
+  }
+}
+
+// We do not want to run the test when assembling because we prefer to chain the various build steps manually, e.g.
+// via `./sbt clean test scoverage:test package packageDoc packageSrc doc assembly`.  Because, in this scenario, we
+// have already run the tests before reaching the assembly step, we do not re-run the tests again.
+//
+// Comment the following line if you do want to (re-)run all the tests before building assembly.
+test in assembly := {}
+
+logLevel in assembly := Level.Warn
