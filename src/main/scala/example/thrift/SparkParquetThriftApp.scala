@@ -22,6 +22,7 @@ package example.thrift
 
 // Spark.
 
+import example.thrift.spark_parquet_thrift.SampleThriftObject
 import org.apache.spark
 import org.apache.spark.SparkContext._
 import org.apache.spark.{SparkConf, SparkContext}
@@ -36,13 +37,12 @@ import org.apache.hadoop.mapreduce.Job
 import parquet.hadoop.thrift.{ParquetThriftInputFormat, ParquetThriftOutputFormat, ThriftReadSupport}
 import parquet.hadoop.{ParquetInputFormat, ParquetOutputFormat}
 
-import example.thrift.spark_parquet_thrift.SampleThriftObject
 
 /*
 sbt assembly && ~SPARK_HOME/bin/spark-submit \
   --class "example.thrift.SparkParquetThriftApp" \
   --master "local[*]" \
-  target/scala-2.10/SparkParquetThrift.jar
+  target/scala-2.10/SparkParquetAvroThrift.jar
  */
 
 object SparkParquetThriftApp {
