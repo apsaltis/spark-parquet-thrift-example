@@ -16,7 +16,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-namespace java com.adobe.spark_parquet_thrift
+namespace java example.thrift.spark_parquet_thrift
 
 struct SampleThriftObject {
   10: string col_a;

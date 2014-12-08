@@ -1,4 +1,4 @@
-@namespace("avrotest.avro")
+@namespace("example.avro")
 protocol AvroSparkSQL {
     record User {
         // The name of the user

@@ -15,21 +15,17 @@
  * limitations under the License.
  */
 
-package avrotest
+package example.avro
 
-import scala.reflect.ClassTag
-
-import org.apache.avro.io.{BinaryEncoder, EncoderFactory, DecoderFactory, BinaryDecoder}
-import org.apache.avro.specific.{SpecificDatumWriter, SpecificDatumReader, SpecificRecord}
-
-import com.esotericsoftware.kryo.{Serializer, Kryo}
-import com.esotericsoftware.kryo.io.{Output, Input}
-
-import it.unimi.dsi.fastutil.io.{FastByteArrayOutputStream, FastByteArrayInputStream}
-
+import example.avro.{Message, User}
+import com.esotericsoftware.kryo.io.{Input, Output}
+import com.esotericsoftware.kryo.{Kryo, Serializer}
+import it.unimi.dsi.fastutil.io.{FastByteArrayInputStream, FastByteArrayOutputStream}
+import org.apache.avro.io.{BinaryDecoder, BinaryEncoder, DecoderFactory, EncoderFactory}
+import org.apache.avro.specific.{SpecificDatumReader, SpecificDatumWriter, SpecificRecord}
 import org.apache.spark.serializer.KryoRegistrator
 
-import avrotest.avro.{Message, User}
+import scala.reflect.ClassTag
 
 // This file is based (and mostly copied from):
 // https://github.com/bigdatagenomics/adam/blob/master/adam-core/src/main/scala/org/bdgenomics/adam/serialization/ADAMKryoRegistrator.scala

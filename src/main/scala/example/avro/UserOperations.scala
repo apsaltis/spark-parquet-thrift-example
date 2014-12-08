@@ -15,36 +15,32 @@
  * limitations under the License.
  */
 
-package avrotest
+package example.avro
 
 import java.io.File
-
-import scala.util.Random
-
-import parquet.avro.{AvroReadSupport, AvroParquetWriter}
-import parquet.hadoop.ParquetInputFormat
-
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.Path
-import org.apache.hadoop.mapred.JobConf
 
 import org.apache.avro.Schema
 import org.apache.avro.file.{DataFileReader, DataFileWriter}
 import org.apache.avro.generic.{GenericDatumReader, IndexedRecord}
 import org.apache.avro.mapred.FsInput
-import org.apache.avro.specific.{SpecificRecord, SpecificDatumWriter}
-
+import org.apache.avro.specific.{SpecificDatumWriter, SpecificRecord}
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.Path
+import org.apache.hadoop.mapred.JobConf
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
+import parquet.avro.{AvroParquetWriter, AvroReadSupport}
+import parquet.hadoop.ParquetInputFormat
+
 import scala.reflect.ClassTag
+import scala.util.Random
 
 // our own class generated from user.avdl by Avro tools
-import avrotest.avro.{Message, User}
+import example.avro.{Message, User}
 
 // Implicits
 import org.apache.spark.SparkContext._
-import collection.JavaConversions._
 
 object UserOperations {
 

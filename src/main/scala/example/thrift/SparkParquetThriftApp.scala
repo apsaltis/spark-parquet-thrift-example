@@ -16,33 +16,27 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-package com.adobe.spark_parquet_thrift
+package example.thrift
 
 // Scala collections.
-import scala.collection.mutable.ArrayBuffer
 
 // Spark.
+
 import org.apache.spark
-import spark.{SparkConf,SparkContext}
-import spark.rdd.RDD
 import org.apache.spark.SparkContext._
+import org.apache.spark.{SparkConf, SparkContext}
 
 // Map Reduce.
-import org.apache.hadoop.{conf,fs,mapreduce}
-import fs.{FileSystem,Path}
-import mapreduce.Job
-import conf.Configuration
+import org.apache.hadoop.mapreduce
+import org.apache.hadoop.mapreduce.Job
 
 // File.
-import com.google.common.io.Files
-import java.io.File
 
 // Parquet and Thrift support.
-import parquet.hadoop.{ParquetOutputFormat, ParquetInputFormat}
-import parquet.hadoop.thrift.{
-  ParquetThriftInputFormat,ParquetThriftOutputFormat,
-  ThriftReadSupport,ThriftWriteSupport
-}
+import parquet.hadoop.thrift.{ParquetThriftInputFormat, ParquetThriftOutputFormat, ThriftReadSupport}
+import parquet.hadoop.{ParquetInputFormat, ParquetOutputFormat}
+
+import example.thrift.spark_parquet_thrift.SampleThriftObject
 
 object SparkParquetThriftApp {
   def main(args: Array[String]) {
@@ -51,8 +45,8 @@ object SparkParquetThriftApp {
     println("  Memory: " + mem)
     val sparkConf = new SparkConf()
       .setAppName("SparkParquetThrift")
-      .setMaster("local[1]")
-      .setSparkHome("/usr/lib/spark")
+      .setMaster("local[*]")
+      .setSparkHome("~/Apps/spark-1.1.1-bin-hadoop2.4")
       .setJars(Seq())
       .set("spark.executor.memory", mem)
     val sc = new SparkContext(sparkConf)

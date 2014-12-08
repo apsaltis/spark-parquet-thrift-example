@@ -1,22 +1,19 @@
-package avrotest
+package example.avro
 
 import com.google.common.io.Files
-
 import org.apache.hadoop.fs.Path
-
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.catalyst.util.getTempFilePath
 
 // our own classes generated from user.avdl by Avro tools
-import avrotest.avro.{Message, User}
-import avrotest.UserOperations._
+import example.avro.{Message, User}
+import example.avro.UserOperations._
 
 /*
 sbt assembly && ~SPARK_HOME/bin/spark-submit \
-  --class "avrotest.ParquetAvroSparkExample" \
+  --class "example.avro.ParquetAvroSparkExample" \
   --master "local[*]" \
   target/scala-2.10/SparkParquetThrift.jar
  */
