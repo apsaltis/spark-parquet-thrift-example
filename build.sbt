@@ -27,13 +27,14 @@ name := "SparkParquetThrift"
 
 version := "1.0"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.10.4"
 
 libraryDependencies ++= Seq(
   // Spark dependencies.
   // Mark as provided if distributing to clusters.
   // Don't use 'provided' if running the program locally with `sbt run`.
-  "org.apache.spark" %% "spark-core" % "1.0.0" % "provided",
+  "org.apache.spark" %% "spark-core" % "1.1.0" % "provided",
+  "org.apache.spark" %% "spark-sql" % "1.1.0" % "provided",
   "org.apache.hadoop" % "hadoop-client" % "2.4.0" % "provided" excludeAll(
     ExclusionRule(organization = "org.jboss.netty"),
     ExclusionRule(organization = "io.netty"),
@@ -44,13 +45,20 @@ libraryDependencies ++= Seq(
   ),
   "com.typesafe.akka" %% "akka-slf4j" % "2.2.3",
   "org.apache.thrift" % "libthrift" % "0.9.1",
-  "com.twitter" % "parquet-thrift" % "1.5.0"
+  "com.twitter" % "parquet-thrift" % "1.5.0",
+  "com.twitter" % "parquet-avro" % "1.5.0",
+  "org.apache.avro" % "avro" % "1.6.3",
+  "org.apache.avro" % "avro-mapred" % "1.6.3",
+  "it.unimi.dsi" % "fastutil" % "6.1.0"
 )
 
 resolvers ++= Seq(
   "Akka Repository" at "http://repo.akka.io/releases/",
   "Twitter" at "http://maven.twttr.com/",
-  "bigtoast-github" at "http://bigtoast.github.com/repo/"
+  "bigtoast-github" at "http://bigtoast.github.com/repo/",
+  "sbt-plugin-releases" at "http://repo.scala-sbt.org/scalasbt/sbt-plugin-releases"
 )
 
 seq(ThriftPlugin.thriftSettings: _*)
+
+seq(sbtavro.SbtAvro.avroSettings : _*)
