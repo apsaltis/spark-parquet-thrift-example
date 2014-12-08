@@ -1,0 +1,9 @@
+{"namespace": "com.adobe.spark_parquet_avro",
+ "type": "record",
+ "name": "SampleAvroObject",
+ "fields": [
+     {"name": "col_a", "type": "string"},
+     {"name": "col_b",  "type": ["string", "null"]},
+     {"name": "col_c", "type": ["string", "null"]}
+ ]
+}
