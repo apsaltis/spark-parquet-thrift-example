@@ -103,39 +103,16 @@ object SparkParquetAvroApp {
     ParquetOutputFormat.setWriteSupportClass(job,classOf[AvroWriteSupport])
     AvroParquetOutputFormat.setSchema(job, SampleAvroObject.SCHEMA$)
 
-
-
     val avroRdd = sc.newAPIHadoopFile(sampleAvroFile.toString(),
       classOf[AvroKeyInputFormat[SampleAvroObject]],
       classOf[AvroKey[SampleAvroObject]],
       classOf[NullWritable])
 
-    avroRdd.foreach(println)
+    avroRdd.foreach(i => println(" AVRO: " + i))
 
-//    val specificRecords = avroRdd.map{case (ak, _) => ak.datum()}
-//
-//    specificRecords.foreach(println)
+    val parquetData = readParquetRDD[SampleAvroObject](sc, parquetFile.toString)
 
+    parquetData.foreach(i => println(" PARQUET: " + i))
 
-//    sc.parallelize((1 to 100).map(factory)).map((null, _))
-//      .saveAsNewAPIHadoopFile(s"$parquetStore/parquet", classOf[Void],
-//        classOf[SampleAvroObject],
-//        classOf[ParquetOutputFormat[SampleAvroObject]],
-//        job.getConfiguration)
-
-
-////    job.getConfiguration.set("parquet.thrift.column.filter", "col_a;col_b")
-//
-//    val converter = sc.broadcast(specificAvroBinaryInjectionForSampleAvroObject)
-//
-    val parquetData = readParquetRDD[SampleAvroObject](sc, parquetStore)
-//    val parquetData = sc.newAPIHadoopFile(
-//      parquetStore,
-//      classOf[ParquetInputFormat[SampleAvroObject]],
-//      classOf[Void],
-//      classOf[SampleAvroObject],
-//      job.getConfiguration
-////    )
-//    println(parquetData.collect().map("  - " + _).mkString("\n"))
   }
 }
