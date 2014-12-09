@@ -17,6 +17,7 @@
 
 package example.avro
 
+import example.avro.spark_parquet_avro.SampleAvroObject
 import example.avro.{Message, User}
 import com.esotericsoftware.kryo.io.{Input, Output}
 import com.esotericsoftware.kryo.{Kryo, Serializer}
@@ -38,6 +39,6 @@ class SparkAvroKryoRegistrator extends KryoRegistrator {
     kryo.register(classOf[GenericRecord], AvroSerializer.GenericRecordSerializer[GenericRecord]())
     kryo.register(classOf[User], AvroSerializer.SpecificRecordSerializer[User])
     kryo.register(classOf[Message], AvroSerializer.SpecificRecordSerializer[Message])
-
+    kryo.register(classOf[Message], AvroSerializer.SpecificRecordSerializer[SampleAvroObject])
   }
 }

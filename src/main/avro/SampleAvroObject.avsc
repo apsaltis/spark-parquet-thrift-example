@@ -1,4 +1,4 @@
-{"namespace": "com.adobe.spark_parquet_avro",
+{"namespace": "example.avro.spark_parquet_avro",
  "type": "record",
  "name": "SampleAvroObject",
  "fields": [
