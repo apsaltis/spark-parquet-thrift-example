@@ -34,8 +34,6 @@ import org.apache.spark.serializer.KryoRegistrator
 
 class SparkAvroKryoRegistrator extends KryoRegistrator {
   override def registerClasses(kryo: Kryo) {
-    //kryo.register(classOf[User], new AvroSerializer[User]())
-    //kryo.register(classOf[Message], new AvroSerializer[Message]())
     kryo.register(classOf[GenericRecord], AvroSerializer.GenericRecordSerializer[GenericRecord]())
     kryo.register(classOf[User], AvroSerializer.SpecificRecordSerializer[User])
     kryo.register(classOf[Message], AvroSerializer.SpecificRecordSerializer[Message])
