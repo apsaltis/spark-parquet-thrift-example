@@ -36,7 +36,7 @@ seq(ThriftPlugin.thriftSettings: _*)
 seq(sbtavro.SbtAvro.avroSettings : _*)
 
 // Configure the desired Avro version.  sbt-avro automatically injects a libraryDependency.
-(version in avroConfig) := "1.7.7"
+//(version in avroConfig) := "1.7.6"
 
 // Look for *.avsc etc. files in src/test/avro
 (sourceDirectory in avroConfig) <<= (sourceDirectory in Compile)(_ / "avro")
@@ -57,20 +57,20 @@ libraryDependencies ++= Seq(
   // Don't use 'provided' if running the program locally with `sbt run`.
   "org.apache.spark" %% "spark-core" % "1.1.0" % "provided",
   "org.apache.spark" %% "spark-sql" % "1.1.0" % "provided",
-  "org.apache.hadoop" % "hadoop-client" % "2.4.0" % "provided" excludeAll(
-    ExclusionRule(organization = "org.jboss.netty"),
-    ExclusionRule(organization = "io.netty"),
-    ExclusionRule(organization = "org.eclipse.jetty"),
-    ExclusionRule(organization = "org.mortbay.jetty"),
-    ExclusionRule(organization = "org.ow2.asm"),
-    ExclusionRule(organization = "asm")
-  ),
+//  "org.apache.hadoop" % "hadoop-client" % "2.4.0" % "provided" excludeAll(
+//    ExclusionRule(organization = "org.jboss.netty"),
+//    ExclusionRule(organization = "io.netty"),
+//    ExclusionRule(organization = "org.eclipse.jetty"),
+//    ExclusionRule(organization = "org.mortbay.jetty"),
+//    ExclusionRule(organization = "org.ow2.asm"),
+//    ExclusionRule(organization = "asm")
+//  ),
   "com.typesafe.akka" %% "akka-slf4j" % "2.2.3",
   "org.apache.thrift" % "libthrift" % "0.9.1",
   "com.twitter" % "parquet-thrift" % "1.5.0",
   "com.twitter" % "parquet-avro" % "1.5.0",
-  //"org.apache.avro" % "avro" % "1.7.7",
-  "org.apache.avro" % "avro-mapred" % "1.7.7",
+  //"org.apache.avro" % "avro" % "1.7.6" classifier "hadoop2",
+  "org.apache.avro" % "avro-mapred" % "1.7.6" classifier "hadoop2",
   "it.unimi.dsi" % "fastutil" % "6.1.0",
   "com.twitter" %% "bijection-core" % bijectionVersion,
   "com.twitter" %% "bijection-avro" % bijectionVersion,
