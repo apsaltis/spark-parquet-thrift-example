@@ -36,7 +36,7 @@ seq(ThriftPlugin.thriftSettings: _*)
 seq(sbtavro.SbtAvro.avroSettings : _*)
 
 // Configure the desired Avro version.  sbt-avro automatically injects a libraryDependency.
-(version in avroConfig) := "1.7.6"
+(version in avroConfig) := "1.7.7"
 
 // Look for *.avsc etc. files in src/test/avro
 (sourceDirectory in avroConfig) <<= (sourceDirectory in Compile)(_ / "avro")
@@ -69,8 +69,8 @@ libraryDependencies ++= Seq(
   "org.apache.thrift" % "libthrift" % "0.9.1",
   "com.twitter" % "parquet-thrift" % "1.5.0",
   "com.twitter" % "parquet-avro" % "1.5.0",
-  //"org.apache.avro" % "avro" % "1.7.6",
-  "org.apache.avro" % "avro-mapred" % "1.7.6",
+  //"org.apache.avro" % "avro" % "1.7.7",
+  "org.apache.avro" % "avro-mapred" % "1.7.7",
   "it.unimi.dsi" % "fastutil" % "6.1.0",
   "com.twitter" %% "bijection-core" % bijectionVersion,
   "com.twitter" %% "bijection-avro" % bijectionVersion,
@@ -78,6 +78,21 @@ libraryDependencies ++= Seq(
   "com.twitter" %% "chill-avro" % chillVersion,
   "com.twitter" %% "chill-bijection" % chillVersion
 )
+
+mergeStrategy in assembly <<= (mergeStrategy in assembly) {
+  (old) => {
+    case s if s.endsWith(".class") => MergeStrategy.last
+    case s if s.endsWith(".default") => MergeStrategy.last
+    case s if s.endsWith(".map") => MergeStrategy.last
+    case s if s.endsWith(".providers") => MergeStrategy.last
+    case s if s.endsWith(".properties") => MergeStrategy.last
+    case s if s.endsWith(".RSA") => MergeStrategy.last
+    case s if s.endsWith("mailcap") => MergeStrategy.last
+   // case PathList("org", "apache", xs @ _*) => MergeStrategy.last
+    case x => old(x)
+  }
+}
+
 
 libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-reflect" % _)
 
@@ -154,21 +169,6 @@ testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-o")
 instrumentSettings
 
 run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run))
-
-mergeStrategy in assembly <<= (mergeStrategy in assembly) {
-  (old) => {
-    case s if s.endsWith(".class") => MergeStrategy.last
-    case s if s.endsWith(".default") => MergeStrategy.last
-    case s if s.endsWith(".map") => MergeStrategy.last
-    case s if s.endsWith(".providers") => MergeStrategy.last
-    case s if s.endsWith(".properties") => MergeStrategy.last
-    case s if s.endsWith(".RSA") => MergeStrategy.last
-    case s if s.endsWith("mailcap") => MergeStrategy.last
-    case PathList("org", "apache", xs @ _*) => MergeStrategy.last
-    case PathList("maven", xs @ _*) => MergeStrategy.last
-    case x => old(x)
-  }
-}
 
 // We do not want to run the test when assembling because we prefer to chain the various build steps manually, e.g.
 // via `./sbt clean test scoverage:test package packageDoc packageSrc doc assembly`.  Because, in this scenario, we
