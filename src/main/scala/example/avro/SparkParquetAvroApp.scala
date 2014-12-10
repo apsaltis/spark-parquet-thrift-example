@@ -75,10 +75,10 @@ object SparkParquetAvroApp {
     val sc = new SparkContext(sparkConf)
 
     println("Creating sample Avro data.")
-    val sampleData = Range(1,10).toSeq.map{ v: Int =>
-      new SampleAvroObject("a"+v,"b"+v,"c"+v)
-    }
-    println(sampleData.map("  - " + _).mkString("\n"))
+//    val sampleData = Range(1,10).toSeq.map{ v: Int =>
+//      new SampleAvroObject("a"+v,"b"+v,"c"+v)
+//    }
+//    println(sampleData.map("  - " + _).mkString("\n"))
 
 
     val parquetStore = "file:///tmp/sample_store/avro"
@@ -92,7 +92,7 @@ object SparkParquetAvroApp {
 
     val sampleAvroFile = getTempFilePath("sample", ".avro")
     val parquetFile = new Path(Files.createTempDir().toString, "sample.parquet")
-    UserOperations.writeAvroFile[SampleAvroObject](sampleAvroFile, factory, 100)
+    UserOperations.writeAvroFile[SampleAvroObject](sampleAvroFile, factory, 20)
 
     convertAvroToParquetAvroFile(
       new Path(sampleAvroFile.toString),
@@ -113,6 +113,8 @@ object SparkParquetAvroApp {
     val parquetData = readParquetRDD[SampleAvroObject](sc, parquetFile.toString)
 
     parquetData.foreach(i => println(" PARQUET: " + i))
+
+    avroRdd.map(i => i._1).map(u => u.datum().col_a).foreach(println)
 
   }
 }
